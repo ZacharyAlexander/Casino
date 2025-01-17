@@ -1,0 +1,110 @@
+"""
+Changes to make: 
+1. Function in casino to calcuate bets and bet multiplier
+2. move calculate winnings function to casino class and have subclasses inherit from it
+3. After playing a game, return to casino, show current chip totoal and ask what game they want to play next
+
+"""
+
+
+import random
+
+class Casino:
+    def __init__(self):
+        self.player = input("Enter player name: ")
+        self.chips = int(input("Enter starting chips: "))
+        self.choice = input("Enter your choice (Blackjack/Number guesser): ").lower()
+        self.start_game()
+    def start_game(self):
+        if self.choice == "blackjack":
+            Blackjack(self.player, self.chips).play_hand()
+        elif self.choice == "number guesser":
+            Number_guesser(self.player, self.chips).play_guesser()
+        else:
+            print("Invalid choice")
+            return
+        
+class Blackjack(Casino):
+    def __init__(self, player, chips):
+        self.player = player
+        self.chips = chips
+
+    def play_hand(self):
+        bet_multiplier = random.randint(2, 10)
+        print(f"The bet multiplier in this hand is x{bet_multiplier}")
+        bet = int(input("Input your bet: "))
+        self.chips -= bet
+        print(f"You have bet {bet}, your chip total is now {self.chips}")
+
+        response = input("Ready to play? ").lower()
+
+        if response == "yes":
+            first_card = random.randint(0, 10)
+            second_card = random.randint(0, 10)
+            hand_total = first_card + second_card
+
+            print(f"Your first card is {first_card}, your second card is {second_card}.")
+            print(f"Your hand total is {hand_total}")
+
+            choice = input("Stick or twist? ").lower()
+
+            if choice == "stick":
+                self.chips = self.calculate_win(hand_total, bet, bet_multiplier)
+            elif choice == "twist":
+                hand_total += random.randint(0, 10)
+                print(f"Your new hand total is {hand_total}")
+                self.chips = self.calculate_win(hand_total, bet, bet_multiplier)
+            
+    def calculate_win(self, hand_total, bet, bet_multiplier):
+        casino_total = random.randint(2, 24)
+        if hand_total > casino_total:
+            win_amount = bet * bet_multiplier
+            self.chips += win_amount
+            print(f"Your total is: {hand_total}, the casino's total is {casino_total}.")
+            print(f"Your winnings are: {win_amount}")
+            print("You've won this round!")
+        else:
+            print(f"Your total is {hand_total}, and the casino's total is {casino_total}.")
+            print("The casino has won.")
+        return self.chips
+
+class Number_guesser(Casino):
+    def __init__(self, player, chips):
+        self.player = player
+        self.chips = chips
+    def play_guesser(self):
+        bet_multiplier = random.randint(2, 10)
+        print(f"The bet multiplier in this hand is x{bet_multiplier}")
+        bet = int(input("Input your bet: "))
+        self.chips -= bet
+        print(f"You have bet {bet}, your chip total is now {self.chips}")
+
+        response = input("Ready to play? ").lower()
+        if response == "yes":
+            number = random.randint(1, 5)
+            guess = int(input("Guess a number between 1 and 5: "))
+            if guess == number:
+                print("You've guessed correctly!")
+                self.chips = self.calculate_win(number, guess, bet, bet_multiplier)
+            else:
+                print(f"Sorry, the number was {number}")
+                return self.chips
+        else: return
+    def calculate_win(self, number, guess, bet, bet_multiplier):
+        casino_total = random.randint(2, 24)
+        if number == guess:
+            win_amount = bet * bet_multiplier
+            self.chips += win_amount
+            print("You won!")
+            print(f"Your winnings are: {win_amount}")
+
+        else:
+            print(f"Number guessed: {guess}, number was: {number}")
+            print("You lost.")
+        return self.chips
+
+Casino()
+
+
+
+
